@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Air-Gapped Optical QR Transfer | Live Web Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --panel-bg: rgba(22, 30, 46, 0.75);
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --accent-cyan: #00f2fe;
+      --accent-blue: #4facfe;
+      --text-main: #f0f4f8;
+      --text-muted: #8a99ad;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(79, 172, 254, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(0, 242, 254, 0.12) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .landing-card {
+      max-width: 800px;
+      width: 100%;
+      background: var(--panel-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    .hero-icon { font-size: 3rem; margin-bottom: 12px; }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 640px) {
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+
+    .mode-card {
+      background: rgba(10, 14, 23, 0.6);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .mode-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      background: rgba(0, 242, 254, 0.05);
+    }
+
+    .mode-card .card-icon { font-size: 2rem; }
+    .mode-card h2 { font-size: 1.2rem; color: var(--accent-cyan); }
+    .mode-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.95rem;
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      color: #040914;
+      margin-top: 8px;
+    }
+
+    .pairing-box {
+      background: rgba(10, 14, 23, 0.8);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #landingQrDisplay {
+      background: #fff;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-cyan); }
+  </style>
+</head>
+<body>
+  <div class="landing-card">
+    <div class="hero-icon">⚡</div>
+    <h1>Air-Gapped Optical QR Transfer</h1>
+    <p class="subtitle">A 100% offline, zero-network optical data transfer protocol. Transmits text, JSON, images, and files exclusively via Base45 animated QR code streams.</p>
+
+    <div class="cards-grid">
+      <a href="public/sender/index.html" class="mode-card">
+        <span class="card-icon">🖥️</span>
+        <h2>PC Sender Engine</h2>
+        <p>Broadcast data or upload files via 2x2 Multi-QR streams with real-time speed control.</p>
+        <span class="btn">Launch Sender</span>
+      </a>
+
+      <a href="public/receiver/index.html" class="mode-card">
+        <span class="card-icon">📱</span>
+        <h2>Mobile Receiver</h2>
+        <p>Scan streams with camera (HTTPS secure context), reassemble offline, and preview images.</p>
+        <span class="btn">Launch Receiver</span>
+      </a>
+    </div>
+
+    <div class="pairing-box">
+      <span style="font-size: 0.9rem; color: var(--text-muted);">Scan on your phone to open the Receiver page directly:</span>
+      <div id="landingQrDisplay"></div>
+      <span id="receiverUrlText" class="mono">Loading URL...</span>
+    </div>
+  </div>
+
+  <script src="lib/qrcode.min.js"></script>
+  <script>
+    const receiverUrl = `${window.location.origin}${window.location.pathname.replace(/\/index\.html\/?$/, '')}public/receiver/index.html`;
+    document.getElementById('receiverUrlText').textContent = receiverUrl;
+    if (window.QRCode) {
+      new window.QRCode(document.getElementById('landingQrDisplay'), {
+        text: receiverUrl,
+        width: 160,
+        height: 160,
+        correctLevel: window.QRCode.CorrectLevel.M,
+      });
+    }
+  </script>
+</body>
+</html>

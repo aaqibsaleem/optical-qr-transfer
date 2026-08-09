@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Air-Gapped QR Receiver | Optical Transfer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="receiver.css">
+</head>
+<body>
+  <div class="mobile-container">
+    <header class="header">
+      <div class="title-row">
+        <span class="icon">📷</span>
+        <h1>Optical Receiver</h1>
+      </div>
+      <div class="state-pill" id="statePill">
+        <span class="dot" id="stateDot"></span>
+        <span id="stateText">Waiting for Session...</span>
+      </div>
+    </header>
+
+    <!-- Camera Scanner Viewport -->
+    <main class="camera-section">
+      <div class="video-wrapper">
+        <video id="videoFeed" playsinline autoplay muted></video>
+        <canvas id="overlayCanvas"></canvas>
+        <div id="cameraPrompt" class="camera-prompt">
+          <button id="startCamBtn" class="btn btn-primary">Tap to Start Camera</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Transfer Progress & Grid -->
+    <section class="progress-section">
+      <div class="progress-header">
+        <span class="progress-title" id="sessionTitle">Received Chunks</span>
+        <span class="progress-stats" id="progressStats">0 / 0 (0%)</span>
+      </div>
+
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+      </div>
+
+      <!-- Chunk Grid Visualizer -->
+      <div class="chunk-grid" id="chunkGrid"></div>
+    </section>
+
+    <!-- Reassembled Result Section -->
+    <section id="resultSection" class="result-section hidden">
+      <div class="result-header">
+        <h2>✓ Reassembled Transfer</h2>
+        <span id="resultMetaBadge" class="file-type-badge">Text</span>
+      </div>
+
+      <!-- Image Preview Container -->
+      <div id="imagePreviewContainer" class="image-preview-container hidden">
+        <img id="imagePreview" alt="Received Image Preview">
+      </div>
+
+      <!-- Text Result Container -->
+      <div id="textResultContainer" class="result-box hidden">
+        <pre id="resultText"></pre>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="result-actions mt-2">
+        <a id="downloadBtn" class="btn btn-primary hidden" download>Download File</a>
+        <button id="copyBtn" class="btn btn-secondary">Copy Text</button>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="receiver.js"></script>
+</body>
+</html>

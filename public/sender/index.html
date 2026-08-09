@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Air-Gapped QR Sender | Optical Transfer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="sender.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <h1>Air-Gapped Optical Transfer</h1>
+        <span class="badge">1-Way Data Channel</span>
+      </div>
+      <div class="status-indicator">
+        <span class="dot active"></span>
+        <span>Sender Engine Ready</span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <!-- Input Panel -->
+      <section class="panel input-panel">
+        <h2>1. Data Payload</h2>
+        
+        <!-- Mode Switcher Tabs -->
+        <div class="tab-switcher">
+          <button id="tabText" class="tab-btn active">Text / JSON</button>
+          <button id="tabFile" class="tab-btn">File / Image Upload</button>
+        </div>
+
+        <!-- Text Input Mode -->
+        <div id="textModeGroup" class="mode-group">
+          <div class="form-group">
+            <label for="payloadInput">Text / JSON Payload</label>
+            <textarea id="payloadInput" rows="7" placeholder="Enter text or JSON to transmit air-gapped via QR stream...">{
+  "project": "Optical QR Data Transfer",
+  "version": "1.0.0",
+  "airGapped": true,
+  "data": "This message is transmitted exclusively via optical QR frames."
+}</textarea>
+          </div>
+        </div>
+
+        <!-- File Input Mode -->
+        <div id="fileModeGroup" class="mode-group hidden">
+          <div class="form-group">
+            <label for="fileInput">Select File / Image</label>
+            <div class="file-drop-zone" id="dropZone">
+              <input type="file" id="fileInput" class="file-input-hidden">
+              <div class="drop-zone-content">
+                <span class="upload-icon">📁</span>
+                <span class="upload-text">Click or drag file here</span>
+                <span class="upload-subtext">Images, PDFs, Text, Zip (Recommended &lt; 500 KB)</span>
+              </div>
+            </div>
+            <div id="selectedFileInfo" class="selected-file-info hidden">
+              <span class="file-name" id="fileNameDisplay">-</span>
+              <span class="file-size" id="fileSizeDisplay">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="payload-stats">
+          <span>Bytes: <strong id="statBytes">0</strong></span>
+          <span>SHA-256: <strong id="statSha256" class="mono">-</strong></span>
+        </div>
+
+        <h2 class="mt-4">2. Transmission Settings</h2>
+        <div class="settings-grid">
+          <div class="form-group">
+            <label for="fpsControl">Speed: <span id="fpsVal">8</span> FPS</label>
+            <input type="range" id="fpsControl" min="2" max="20" value="8">
+          </div>
+          <div class="form-group">
+            <label for="chunkSizeSelect">Chunk Size Preset</label>
+            <select id="chunkSizeSelect">
+              <option value="60">Conservative (60 B)</option>
+              <option value="120" selected>Balanced (120 B)</option>
+              <option value="250">Aggressive (250 B)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ecLevelSelect">QR Error Correction</label>
+            <select id="ecLevelSelect">
+              <option value="L">Low (L - 7%)</option>
+              <option value="M" selected>Medium (M - 15%)</option>
+              <option value="Q">Quartile (Q - 25%)</option>
+              <option value="H">High (H - 30%)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="qrLayoutSelect">Multi-QR Grid Layout</label>
+            <select id="qrLayoutSelect">
+              <option value="1x1">Single QR (1x1 Standard)</option>
+              <option value="2x1">Dual Grid (2x1 Side-by-Side)</option>
+              <option value="2x2" selected>Quad Grid (2x2 Multi-QR High Speed)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="startBtn" class="btn btn-primary">Start Broadcast</button>
+          <button id="stopBtn" class="btn btn-secondary" disabled>Stop</button>
+        </div>
+      </section>
+
+      <!-- QR Display Panel -->
+      <section class="panel display-panel">
+        <h2>3. Optical Broadcast Stream</h2>
+        <div class="qr-canvas-wrapper">
+          <div id="qrDisplay" class="qr-display"></div>
+          <div id="qrOverlay" class="qr-overlay hidden">
+            <span>Broadcast Stopped</span>
+          </div>
+        </div>
+
+        <div class="stream-info">
+          <div class="info-card">
+            <span class="label">Current Frame</span>
+            <span id="frameCounter" class="value">Frame - / -</span>
+          </div>
+          <div class="info-card">
+            <span class="label">Actual FPS</span>
+            <span id="actualFps" class="value">0.0</span>
+          </div>
+          <div class="info-card">
+            <span class="label">Broadcast Loop</span>
+            <span id="loopCounter" class="value">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Mobile Receiver Pairing QR -->
+      <section class="panel pairing-panel">
+        <h2>4. Connect Phone Camera</h2>
+        <p class="subtext">Scan with your mobile camera to open the receiver page over LAN (No app required).</p>
+        <div class="pairing-qr-box">
+          <div id="pairingQrDisplay"></div>
+        </div>
+        <p id="pairingUrl" class="mono pairing-url">Loading receiver URL...</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="../../lib/qrcode.min.js"></script>
+  <script type="module" src="sender.js"></script>
+</body>
+</html>
